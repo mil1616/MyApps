@@ -1,0 +1,15 @@
+com\mil\randommenu\dao\VegetableDao.class
+com\mil\randommenu\model\Item.class
+com\mil\randommenu\model\MenuItem.class
+com\mil\randommenu\service\MenuService.class
+com\mil\randommenu\controller\VegetableController.class
+com\mil\randommenu\dao\MenuDao.class
+com\mil\randommenu\model\Ingredient.class
+com\mil\randommenu\dao\WeekItemDao.class
+com\mil\randommenu\util\HibernateUtil.class
+com\mil\randommenu\dao\ModelDao.class
+com\mil\randommenu\model\Menu.class
+com\mil\randommenu\model\WeekItem.class
+com\mil\randommenu\model\Vegetable.class
+com\mil\randommenu\controller\MenuController.class
+com\mil\randommenu\dao\MenuItemDao.class
