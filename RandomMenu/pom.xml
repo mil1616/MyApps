@@ -35,7 +35,7 @@
         </dependency> 
         
         
-<!--        <dependency>  
+        <!--        <dependency>  
             <groupId>org.hsqldb</groupId>  
             <artifactId>hsqldb</artifactId>  
             <version>2.2.8</version>  
@@ -128,10 +128,17 @@
         </dependency>
         
         <dependency>
-	<groupId>mysql</groupId>
-	<artifactId>mysql-connector-java</artifactId>
-	<version>5.1.6</version>
-</dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.6</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4</version>
+        </dependency>
+
 
     </dependencies>
 

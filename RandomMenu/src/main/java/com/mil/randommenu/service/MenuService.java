@@ -16,10 +16,22 @@ import com.mil.randommenu.model.WeekItem;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+//import java.util.*;
+//import javax.mail.*;
+//import javax.mail.internet.*;
+//import javax.activation.*;
 
 /**
  *
@@ -61,6 +73,10 @@ public class MenuService {
 
     @Transactional(readOnly = false)
     public void deleteMenu(long menuId) {
+        List<MenuItem> menuItems = menuItemDao.getMenuItemFromMenu(menuDao.getById(menuId));
+        for (MenuItem menuitem : menuItems) {
+            menuItemDao.delete(menuitem.getId());
+        }
         menuDao.delete(menuId);
     }
 
@@ -87,14 +103,15 @@ public class MenuService {
         return new ArrayList<>();
     }
 
-    public List<Vegetable> getAllVegetablesNotInMenu(String menuId) {
+    public List<Vegetable> getAllVegetablesNotInMenu(Long menuId) {
 
         List<Vegetable> vedgeList = vegetableDao.getAll();
 
-        if (!menuId.isEmpty()) {
-            List<Vegetable> list = getVegetablesFromMenu(Long.valueOf(menuId));
+        if (menuId != null) {
+            List<Vegetable> list = getVegetablesFromMenu(menuId);
             vedgeList.removeAll(list);
         }
+        Collections.sort(vedgeList);
         return vedgeList;
     }
 
@@ -105,11 +122,17 @@ public class MenuService {
 
     @Transactional(readOnly = false)
     public void addToMenu(long menuId, long vegetableId) {
-        menuItemDao.saveMenuItem(MenuItem.getInstanceMenuItem(menuDao.getById(menuId), vegetableDao.getById(vegetableId)));
+        MenuItem menuItem = MenuItem.getInstanceMenuItem(menuDao.getById(menuId), vegetableDao.getById(vegetableId));
+        menuItemDao.saveMenuItem(menuItem);
+        addOrUpdateWeekItem(menuItem);
     }
 
     @Transactional(readOnly = false)
     public void removeFromMenu(long menuId, long menuItemId) {
+        MenuItem menuItem = menuItemDao.getById(menuItemId);
+        menuItem.setQuantity(0);
+        menuItemDao.saveMenuItem(menuItem);
+        removeOrUpdateWeekItem(menuItemId);
         menuItemDao.delete(menuItemId);
     }
 
@@ -135,10 +158,14 @@ public class MenuService {
     public void addOrUpdateWeekItem(MenuItem menuItem) {
         WeekItem weekItem = weekItemDao.getWeekItemFromVegetable(menuItem.getVegetable());
         if (weekItem != null) {
-            weekItem.addQuantity(menuItem.getQuantity());
+            Long count = menuItemDao.countVegetableFromWeekMenus(menuItem.getVegetable());
+            if (count != null) {
+                weekItem.setQuantity(count.intValue());
+            }
         } else {
-            weekItemDao.saveWeekItem(WeekItem.getInstance(menuItem.getVegetable(), menuItem.getQuantity()));
+            weekItem = WeekItem.getInstance(menuItem.getVegetable(), menuItem.getQuantity());
         }
+        weekItemDao.saveWeekItem(weekItem);
     }
 
     @Transactional(readOnly = false)
@@ -155,18 +182,38 @@ public class MenuService {
     public void removeOrUpdateWeekItem(MenuItem menuItem) {
         WeekItem weekItem = weekItemDao.getWeekItemFromVegetable(menuItem.getVegetable());
         if (weekItem != null) {
-            weekItem.removeQuantity(menuItem.getQuantity());
+            Long count = menuItemDao.countVegetableFromWeekMenus(menuItem.getVegetable());
+            if (count != null) {
+                weekItem.setQuantity(count.intValue());
+                weekItemDao.saveWeekItem(weekItem);
+            } else {
+//                weekItemDao.delete(weekItem.getId());
+            }
         }
-//        else {
-//            weekItemDao.saveWeekItem(WeekItem.getInstance(menuItem.getVegetable(), menuItem.getQuantity()));
-//        }
+    }
+
+    public void removeOrUpdateWeekItem(long menuItemId) {
+        MenuItem menuItem = menuItemDao.getById(menuItemId);
+        removeOrUpdateWeekItem(menuItem);
     }
 
     @Transactional(readOnly = false)
     public void saveQuantity(Integer menuQuantity, String menuItemId) {
         MenuItem menuItem = menuItemDao.getById(Long.valueOf(menuItemId));
+        Integer oldQuantity = menuItem.getQuantity();
+        Integer diff;
+        if (oldQuantity != null) {
+            diff = menuQuantity - oldQuantity;
+        } else {
+            diff = 1;
+        }
         menuItem.setQuantity(menuQuantity);
         menuItemDao.saveMenuItem(menuItem);
+        if (diff > 0) {
+            addOrUpdateWeekItem(menuItem);
+        } else if (diff < 0) {
+            removeOrUpdateWeekItem(menuItem);
+        }
     }
 
     @Transactional(readOnly = false)
@@ -185,5 +232,89 @@ public class MenuService {
         List<WeekItem> weekItems = weekItemDao.getWeekItems();
         Collections.sort(weekItems);
         return weekItems;
+    }
+
+    public void saveMenu(Menu menu) {
+        menuDao.saveMenu(menu);
+    }
+
+    public void sendMail() {
+         // Recipient's email ID needs to be mentioned.
+//      String to = "mil1616@gmail.com";
+//
+//      // Sender's email ID needs to be mentioned
+//      String from = "randommenu@orange.com";
+//
+//      // Assuming you are sending email from localhost
+//      String host = "localhost";
+////      String host = "smtp.gmail.com";
+////      String host = "smtp.orange.net";
+//      String port = "587";
+//
+//      // Get system properties
+//      Properties properties = System.getProperties();
+//
+//      // Setup mail server
+//      properties.setProperty("mail.smtp.host", host);
+//      properties.setProperty("mail.smtp.port", "25");
+////      properties.setProperty("mail.smtp.user", to);
+//
+//      // Get the default Session object.
+//      Session session = Session.getDefaultInstance(properties);
+//
+//      try{
+//         // Create a default MimeMessage object.
+//         MimeMessage message = new MimeMessage(session);
+//
+//         // Set From: header field of the header.
+//         message.setFrom(new InternetAddress(to));
+//
+//         // Set To: header field of the header.
+//         message.addRecipient(Message.RecipientType.TO,
+//                                  new InternetAddress(to));
+//
+//         // Set Subject: header field
+//         message.setSubject("This is the Subject Line!");
+//
+//         // Now set the actual message
+//         message.setText("This is actual message");
+//
+//         // Send message
+//         Transport.send(message);
+//         System.out.println("Sent message successfully....");
+
+        final String username = "mil1616@gmail.com";
+        final String password = "--telemark";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+
+        try {
+
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress("from-email@gmail.com"));
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse("to-email@gmail.com"));
+            message.setSubject("Testing Subject");
+            message.setText("Dear Mail Crawler,"
+                    + "\n\n No spam to my email, please!");
+
+            Transport.send(message);
+
+            System.out.println("Done");
+
+        } catch (MessagingException mex) {
+            mex.printStackTrace();
+        }
     }
 }

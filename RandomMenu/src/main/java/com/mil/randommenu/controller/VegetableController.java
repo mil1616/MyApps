@@ -41,15 +41,19 @@ public class VegetableController {
     public ModelAndView addVegetable(@ModelAttribute("vegetable") Vegetable vegetable) {
         Map model = new HashMap();
         model.put("vegetables", menuService.getAllVegetables());
-
-        return new ModelAndView("addVegetable", model);
+//return new ModelAndView("addMenu", model);
+        return new ModelAndView("addMenu", model);
     }
 
     @RequestMapping(value = "/save", method = RequestMethod.POST)
-    public ModelAndView saveVegetable(@ModelAttribute("vegetable") Vegetable vegetable, BindingResult result) {
+    public String saveVegetable(@ModelAttribute("vegetable") Vegetable vegetable, @RequestParam("menuId") String menuId) {
+//    public String saveVegetable(@ModelAttribute("vegetable") Vegetable vegetable, BindingResult result) {
 //        ControllerUtil.logBindingErrors ( result );
         menuService.addVegetable(vegetable);
-        return new ModelAndView("redirect:/menus/add.html");
+//        return new ModelAndView("redirect:/menus/add.html");
+//        return new ModelAndView("redirect:/menus/add.html");
+//        return  new ModelAndView("addMenu");
+       return "redirect:/menus/" + menuId;
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.POST)

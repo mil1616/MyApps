@@ -42,7 +42,6 @@ public class MenuItemDao {
         }
     }
 
-//    public List<vegetable> getvegetablesFromMenu(String menuId) {
     public List<MenuItem> getMenuItemFromMenu(Menu menu) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MenuItem.class);
         criteria.add(Restrictions.eq("menu", menu));
@@ -74,7 +73,6 @@ public class MenuItemDao {
         return criteria.list();
     }
 
-//    public List<MenuItem> countvegetableFromWeekMenus(vegetable vegetable) {
     public Long countVegetableFromWeekMenus(Vegetable vegetable) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MenuItem.class);
         Criteria menuCriteria = criteria.createCriteria("menu");
@@ -83,6 +81,5 @@ public class MenuItemDao {
         vegetableCriteria.add(Restrictions.eq("name", vegetable.getName()));
         criteria.setProjection(Projections.sum("quantity"));
         return (Long) criteria.uniqueResult();
-//        return (Long) criteria.list();
     }
 }

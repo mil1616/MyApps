@@ -27,37 +27,58 @@
 
     <body>
         <div style="padding: 20px">
-            <div>
-                <h1>Add Menu</h1>
-                <c:url var="viewMenusUrl" value="/menus.html" />
-                <a href="${viewMenusUrl}" class="btn btn-link">View Existing Menus</a>
+            <div class="row">
+                <div class="col-md-6">
+                    <h1>Add Menu</h1>
+                    <%--<c:url var="viewMenusUrl" value="/menus.html" />--%>
+                    <spring:url var="viewMenusUrl" value="/menus" />
+                    <!--<a href="${viewMenusUrl}" class="btn btn-link">View Existing Menus</a>-->
+                    <button class="btn btn-link pull-right" onclick="location.href = '${viewMenusUrl}'">View Existing Menus</button>
+                </div>
             </div>
 
             <br /><br />
-            <div>
-                <c:url var="saveMenuUrl" value="/menus/save.html" />
-                <form:form modelAttribute="menu" method="POST" action="${saveMenuUrl}" class="form-inline">
+            <div class="row">
+                <c:url var="saveMenuUrl" value="/menus/${menu.id}/update" />
+                <form:form modelAttribute="menu" method="POST" action="${saveMenuUrl}" >
+
+                    <form:hidden path="id" />
+                    <form:hidden path="name" />
+                    <form:hidden path="isWeekMenu" />
+
                     <div class="col-md-6">
                         <div class="form-group">
-                            <%--<c:out value="Menu name :"></c:out>--%>
-
                             <form:label path="name">Menu name</form:label>
-                            <c:if test="${empty menu.id}">
-                                <form:input type="text" path="name"/>
-                                <form:button type="submit" value="Save Menu" class="btn btn-default">Save</form:button>
-                            </c:if>
-                            <c:if test="${!empty menu.id}">
-                                <c:out value="${menu.name}" />
-                                <!--<input type="submit" value="Save" class="btn btn-default"/>-->
-                                <%--<form:button type="submit" value="Update Menu" class="btn btn-default">Update</form:button>--%>
-                            </c:if>
-                        </div>  
-
-                        <%--</form:form>--%>
-                    </div>  
+                            <c:out value="${menu.name}" />
+                            <button class="btn btn-success pull-right" onclick="location.href = '${updateUrl}'">Save</button>
+                        </div>
+                        <div class="form-group">
+                            <form:label path="comment">Comment</form:label>
+                            <form:textarea path="comment" cssClass="form-control" ></form:textarea>
+                            <spring:url value="/menus/${menu.id}/update" var="updateUrl" />
+                        </div>
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <form:label path="comment">Url (Not Working)</form:label>
+                                <form:input type="text"  cssClass="form-control" path=""/>
+                            </div>
+                            <button class="btn btn-info pull-right" onclick="window.open('http://www.marmiton.org/recettes/recette_gratin-de-courgettes-rapide_17071.aspx', '_blank');">Open URL</button>
+                        </form>
+<!--                        <div class="form-group pull-right">
+                            <button class="btn btn-primary" onclick="location.href = '${updateUrl}'">Save</button>
+                            <button class="btn btn-primary" onclick="window.open('http://www.marmiton.org/recettes/recette_gratin-de-courgettes-rapide_17071.aspx', '_blank');">Open URL</button>
+                        </div>-->
+                    </div>
+                    <!--                    <div class="col-md-6">
+                                            <br /><br />
+                                            <div class="form-group">
+                    <form:label path="comment">Url</form:label>
+                    <form:input type="text"  cssClass="form-control" path=""/>
+                </div>
+                <button class="btn btn-primary pull-right" onclick="window.open('http://www.marmiton.org/recettes/recette_gratin-de-courgettes-rapide_17071.aspx', '_blank');">Open</button>
+            </div>-->
                 </form:form>
             </div>
-            <!--</div>-->
             <br /><br />
             <div class="row">
                 <div class="col-md-6">
@@ -100,23 +121,19 @@
                     </c:if>
                 </div>
 
-
             </div>
 
-            <br /><br />  
+            <br /><br />
             <div>
-                <%--<c:url var="addVegetableUrl" value="/vegetables/add.html" />--%>
-                <!--<a href="${addVegetableUrl}" class="btn btn-link">Add Vegetable</a>-->
-                <!--<br /><br />-->
-                <%--<c:url var="saveVegetableUrl" value="/vegetables/save.html" />--%>
-                <%--<form:form modelAttribute="vegetable" method="POST" action="${saveVegetableUrl}" class="form-inline">--%>
-                <%--<c:out value="New Vegetable :"></c:out>--%>
-                <!--<div class="form-group">-->
-                <%--<form:label path="name">New Vegetable</form:label>--%>
-                <%--<form:input path="name"/>--%>
-                <!--                        <input type="submit" value="Save Vegetable" class="btn btn-default"/>
-                                    </div>-->
-                <%--</form:form>--%>
+                <c:url var="addVegetableUrl" value="/vegetables/save" />
+                <form:form modelAttribute="vegetable" method="POST" action="${addVegetableUrl}" class="form-inline">
+                    <div class="form-group">
+                        <form:label path="name">New Vegetable</form:label>
+                        <form:input path="name"/>
+                        <input id="menuItemId" name="menuId" type="hidden" value="${menu.id}" />
+                        <input type="submit" value="Save Vegetable" class="btn btn-default"/>
+                    </div>
+                </form:form>
             </div>
 
             <br /><br />
@@ -143,12 +160,9 @@
                                             <input id="menuId" name="menuId" type="hidden" value="${menu.id}"/>
                                             <input id="vegetableId" name="vegetableId" type="hidden" value="${vegetable.id}"/>
 
-                                            <c:if test="${isSaved}">
-                                                <input type="submit" class="btn btn-default" value="Add to menu" />
-                                            </c:if>
-                                            <c:if test="${!isSaved}">
-                                                <input type="submit" disabled class="btn btn-default" value="Add to menu" />
-                                            </c:if>
+                                            <%--<c:if test="${isSaved}">--%>
+                                            <input type="submit" class="btn btn-default" value="Add to menu" />
+                                            <%--</c:if>--%>
                                         </form>
                                     </td>
                                 </tr>
@@ -159,6 +173,11 @@
                         There are currently no vegetable created.
                     </c:if>
                 </div>
+
+                <!--                <div class="col-md-6">
+                                    <iframe class="col-lg-12 col-md-12 col-sm-12" src="http://www.marmiton.org/recettes/recette_gratin-de-courgettes-rapide_17071.aspx" >
+                                    </iframe>
+                                </div>-->
             </div>
         </div>
         </div>

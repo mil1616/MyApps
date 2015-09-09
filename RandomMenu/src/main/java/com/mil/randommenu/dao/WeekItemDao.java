@@ -48,7 +48,8 @@ public class WeekItemDao {
 
     public List<WeekItem> getWeekItems() {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(WeekItem.class);
-        criteria.add(Restrictions.gt("quantity", 0));
+//        criteria.add(Restrictions.gt("quantity", 0));
+        criteria.add(Restrictions.disjunction(Restrictions.gt("quantity", 0), Restrictions.isNull("quantity")));
         return criteria.list();
     }
 

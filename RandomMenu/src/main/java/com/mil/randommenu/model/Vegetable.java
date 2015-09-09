@@ -15,6 +15,11 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "vegetable")
-public class Vegetable extends Item implements Serializable {
-    
+public class Vegetable extends Item implements Serializable, Comparable<Vegetable> {
+
+    @Override
+    public int compareTo(Vegetable o) {
+        return this.getName().compareTo(o.getName());
+    }
+
 }
