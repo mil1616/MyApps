@@ -22,7 +22,7 @@
                         <label for="name">Menu Name</label>
                         <g:textField name="name" value="${menu.name}"/>
                         <g:field name="id" value="${menu.id}"/>
-                        <g:link action="save" id="${menu.id}" params="[name: menu.name]" >Save</g:link>
+                        <g:actionSubmit action="update" value="Save" />
                         <br/>
                     </g:form>
                     <g:link action="delete" id="${menu.id}">Delete</g:link>

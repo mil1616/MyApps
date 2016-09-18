@@ -4,20 +4,17 @@ import com.weekmenu.Menu
 import org.springframework.beans.factory.annotation.Autowired
 
 class MenuController {
-
     
     //    static scaffold = Menu
     
     @Autowired MenuService menuService
     
     def index() {
-//        render "Hello World"
         redirect(action: "list")
     }
     
     def create() {
         Menu menu = new Menu()
-        println("create : "+params.toMapString())
         [menu:menu]
     }
 
@@ -32,23 +29,17 @@ class MenuController {
     }
         
     def save() {
-        println("save : "+params.toMapString())
-        println(params["name"])
         def menu = new Menu(params)
         menu.save()
         redirect(action: "list")
     }
-    
-    
         
     def update() {
-        println("update : "+params.toMapString())
 
-//        Menu menu = params["menu"]
-        println(params["name"])
-//        def menu = new Menu(params)
-//        menu.save()
-//        menuService.saveOrUpdate(params)
+        Menu menu = Menu.get(params["id"])
+        menu.properties = params
+        menu.save()
+                
         redirect(action: "list")
     }
     

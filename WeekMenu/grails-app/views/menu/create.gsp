@@ -18,10 +18,10 @@
                 <div class="col-md-6">
                     <h1>Create Menu</h1>
                     <br/>
-                    <g:form method="post">
+                    <g:form name="create" action="save" method="post">
                         <label for="name">Menu Name</label>
                         <g:textField name="name" value="${menu.name}"/>
-                        <g:link action="save" id="${menu.id}" params="[name: menu.name]" >Save</g:link>
+                        <g:actionSubmit action="save" value="Create" />
                         <br/>
                     </g:form>
                 </div>
