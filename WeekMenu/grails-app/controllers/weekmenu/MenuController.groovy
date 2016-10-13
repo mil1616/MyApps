@@ -19,8 +19,14 @@ class MenuController {
     }
 
     def list(){
-        def list = Menu.list()
-        [menulist:list]
+        def menuList = Menu.list()
+        
+        def weeklist = Menu.findAll{
+            isweekMenu
+        }
+        
+//        def weeklist = Menu.findAll { isWeekMenu }
+        [menulist:menuList, weeklist:weeklist]
     }
     
     def edit(){

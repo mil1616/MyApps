@@ -20,4 +20,8 @@ class MenuService {
             menu.save()
         }
     }
+    
+    List<Menu> getWeekMenuList(){
+        return Menu.findAll { it.isWeekMenu }
+    }
 }

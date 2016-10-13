@@ -15,12 +15,26 @@
     <body style="padding: 20px">
 
         <div>
+            <h1>Menus of the Week</h1>
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table">
+                        <g:each in="${weeklist}" var="menu">
+                            <tr><td><g:link action="edit" id="${menu.id}">${menu.name}</g:link></td></tr>
+                        </g:each>        
+                    </table>
+                </div>
+            </div>
             <h1>Existing Menus</h1>
             <div class="row">
                 <div class="col-md-6">
                     <table class="table">
                         <g:each in="${menulist}" var="menu">
-                                <td><g:link action="edit" id="${menu.id}">${menu.name}</g:link></td>
+                            <tr>
+                                <td>
+                                    <g:link action="edit" id="${menu.id}">${menu.name}</g:link>
+                                    <g:link action="add" id="${menu.id}">Add To week</g:link>
+                                </td>
                             </tr>
                         </g:each>        
                     </table>
